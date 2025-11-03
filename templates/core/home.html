@@ -1,0 +1,135 @@
+<!-- templates/core/home.html -->
+{% extends 'base.html' %}
+
+{% block title %}EcoShare - Recycling Platform{% endblock %}
+
+{% block content %}
+<div class="hero-section text-white py-5" style="background: linear-gradient(135deg, #2d6a4f 0%, #52b788 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Share, Recycle, Sustain</h1>
+                <p class="lead mb-4">Join our community to trade reusable items, discover recycling tips, and find local recycling centers.</p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="btn btn-light btn-lg">Browse Items</a>
+                    <a href="#" class="btn btn-outline-light btn-lg">Get Started</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="bi bi-recycle" style="font-size: 200px; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card p-4">
+                <i class="bi bi-box-seam text-success fs-1"></i>
+                <h3 class="mt-3">{{ total_items }}</h3>
+                <p class="text-muted">Available Items</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4">
+                <i class="bi bi-lightbulb text-warning fs-1"></i>
+                <h3 class="mt-3">{{ total_tips }}</h3>
+                <p class="text-muted">Recycling Tips</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4">
+                <i class="bi bi-geo-alt text-primary fs-1"></i>
+                <h3 class="mt-3">{{ total_centers }}</h3>
+                <p class="text-muted">Recycling Centers</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Items -->
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Featured Items</h2>
+        <a href="#" class="btn btn-outline-primary">View All <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row">
+        {% for item in featured_items %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if item.images.all %}
+                    <img src="{{ item.images.first.image.url }}" class="card-img-top" alt="{{ item.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-image fs-1"></i>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <p class="text-muted">
+                        <i class="bi bi-geo-alt"></i> {{ item.location }}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-success">{{ item.get_condition_display }}</span>
+                        {% if item.is_free %}
+                            <span class="badge bg-info">FREE</span>
+                        {% else %}
+                            <span class="badge bg-warning">Trade</span>
+                        {% endif %}
+                    </div>
+                    <a href="#" class="btn btn-primary btn-sm mt-3 w-100">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Featured Tips -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Recycling Tips & Guides</h2>
+            <a href="#" class="btn btn-outline-primary">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row">
+            {% for tip in recent_tips %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <span class="badge bg-secondary mb-2">{{ tip.category.name }}</span>
+                        <h5 class="card-title">{{ tip.title }}</h5>
+                        <p class="card-text">{{ tip.content|truncatewords:20 }}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-person"></i> {{ tip.author.username }}
+                            </small>
+                            <a href="#" class="btn btn-sm btn-outline-primary">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="container my-5">
+    <div class="card bg-primary text-white p-5 text-center">
+        <h2 class="mb-3">Join Our Community Today!</h2>
+        <p class="lead mb-4">Start making a difference by sharing items, learning eco-friendly practices, and connecting with like-minded people.</p>
+        <div>
+            {% if not user.is_authenticated %}
+                <a href="#" class="btn btn-light btn-lg me-3">Sign Up Now</a>
+                <a href="#" class="btn btn-outline-light btn-lg">Login</a>
+            {% else %}
+                <a href="#" class="btn btn-light btn-lg me-3">Post an Item</a>
+                <a href="#" class="btn btn-outline-light btn-lg">Share a Tip</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
