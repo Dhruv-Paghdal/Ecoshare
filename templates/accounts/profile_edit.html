@@ -1,0 +1,181 @@
+<!-- templates/accounts/profile_edit.html -->
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - EcoShare{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-pencil-square"></i> Edit Profile</h2>
+                <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Profile
+                </a>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Avatar Section -->
+                        <div class="text-center mb-4">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" 
+                                     alt="{{ user.username }}" 
+                                     class="rounded-circle mb-3" 
+                                     style="width: 120px; height: 120px; object-fit: cover;"
+                                     id="avatarPreview">
+                            {% else %}
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                     style="width: 120px; height: 120px;"
+                                     id="avatarPlaceholder">
+                                    <i class="bi bi-person-fill text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <label for="{{ form.avatar.id_for_label }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-camera"></i> Change Avatar
+                                </label>
+                                {{ form.avatar }}
+                            </div>
+                            {% if form.avatar.errors %}
+                                <div class="text-danger mt-2">
+                                    {{ form.avatar.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <hr>
+
+                        <!-- Bio Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.bio.id_for_label }}" class="form-label">
+                                <i class="bi bi-card-text"></i> Bio
+                            </label>
+                            <textarea name="{{ form.bio.name }}" 
+                                      class="form-control {% if form.bio.errors %}is-invalid{% endif %}"
+                                      id="{{ form.bio.id_for_label }}"
+                                      rows="4"
+                                      placeholder="Tell us about yourself...">{{ form.bio.value|default:'' }}</textarea>
+                            {% if form.bio.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.bio.errors.0 }}
+                                </div>
+                            {% else %}
+                                <small class="form-text text-muted">
+                                    Maximum 500 characters
+                                </small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Location Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.location.id_for_label }}" class="form-label">
+                                <i class="bi bi-geo-alt"></i> Location
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.location.name }}" 
+                                   class="form-control {% if form.location.errors %}is-invalid{% endif %}"
+                                   id="{{ form.location.id_for_label }}"
+                                   value="{{ form.location.value|default:'' }}"
+                                   placeholder="City, Country">
+                            {% if form.location.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.location.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone Field -->
+                        <div class="mb-4">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">
+                                <i class="bi bi-telephone"></i> Phone Number
+                            </label>
+                            <input type="text" 
+                                   name="{{ form.phone.name }}" 
+                                   class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
+                                   id="{{ form.phone.id_for_label }}"
+                                   value="{{ form.phone.value|default:'' }}"
+                                   placeholder="+1 (123) 456-7890">
+                            {% if form.phone.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.phone.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Settings Card -->
+            <div class="card shadow mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> Account Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-1">Email Address</h6>
+                            <p class="text-muted mb-0">{{ user.email }}</p>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary" disabled>
+                            Change Email
+                        </button>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Password</h6>
+                            <p class="text-muted mb-0">••••••••</p>
+                        </div>
+                        <a href="{% url 'accounts:password_reset' %}" class="btn btn-sm btn-outline-primary">
+                            Change Password
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #id_avatar {
+        display: none;
+    }
+</style>
+
+<script>
+    // Preview avatar before upload
+    document.getElementById('{{ form.avatar.id_for_label }}').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('avatarPreview');
+                const placeholder = document.getElementById('avatarPlaceholder');
+                
+                if (preview) {
+                    preview.src = e.target.result;
+                } else if (placeholder) {
+                    placeholder.innerHTML = `<img src="${e.target.result}" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">`;
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}

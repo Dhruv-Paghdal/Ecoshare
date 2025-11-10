@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 def home(request):
     context = {
@@ -12,6 +13,7 @@ def home(request):
     }
     return render(request, 'core/home.html', context)
 
+@login_required 
 def dashboard(request):    
     context = {
         'user_items': ['Items-1', 'Itmes-2'],
