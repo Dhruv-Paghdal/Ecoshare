@@ -1,0 +1,187 @@
+<!-- templates/core/dashboard.html -->
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - EcoShare{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-4">Welcome back, {{ user.first_name|default:user.username }}!</h1>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center p-4">
+                <i class="bi bi-box-seam text-primary fs-1"></i>
+                <h3 class="mt-3">{{ total_user_items }}</h3>
+                <p class="text-muted">My Items</p>
+                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center p-4">
+                <i class="bi bi-lightbulb text-warning fs-1"></i>
+                <h3 class="mt-3">{{ total_user_tips }}</h3>
+                <p class="text-muted">My Tips</p>
+                <a href="#" class="btn btn-sm btn-outline-warning">View All</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center p-4">
+                <i class="bi bi-heart text-danger fs-1"></i>
+                <h3 class="mt-3">{{ total_favorites }}</h3>
+                <p class="text-muted">Favorites</p>
+                <a href="#" class="btn btn-sm btn-outline-danger">View All</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card p-4">
+                <h4 class="mb-3">Quick Actions</h4>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href=# class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Post New Item
+                    </a>
+                    <a href=# class="btn btn-success">
+                        <i class="bi bi-lightbulb"></i> Share a Tip
+                    </a>
+                    <a href=#  class="btn btn-info">
+                        <i class="bi bi-geo-alt"></i> Find Centers
+                    </a>
+                    <a href="{% url 'accounts:profile_edit' %}" class="btn btn-secondary">
+                        <i class="bi bi-pencil"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- My Recent Items -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Recent Items</h5>
+                    <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if user_items %}
+                        <div class="list-group list-group-flush">
+                            {% for item in user_items %}
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1">{{ item.title }}</h6>
+                                    <small>
+                                        <span class="badge bg-{{ item.status|yesno:'success,warning,secondary' }}">
+                                            {{ item.get_status_display }}
+                                        </span>
+                                    </small>
+                                </div>
+                                <small class="text-muted">{{ item.category.name }} • {{ item.created_at|date:"M d, Y" }}</small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">No items posted yet. Start sharing!</p>
+                        <div class="text-center">
+                            <a href="#" class="btn btn-primary">Post Your First Item</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- My Recent Tips -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Recent Tips</h5>
+                    <a href="#" class="btn btn-sm btn-outline-success">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if user_tips %}
+                        <div class="list-group list-group-flush">
+                            {% for tip in user_tips %}
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1">{{ tip.title }}</h6>
+                                    <small><i class="bi bi-eye"></i> {{ tip.views }}</small>
+                                </div>
+                                <small class="text-muted">{{ tip.category.name }} • {{ tip.created_at|date:"M d, Y" }}</small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">No tips shared yet. Share your knowledge!</p>
+                        <div class="text-center">
+                            <a href="#" class="btn btn-success">Share Your First Tip</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Favorite Tips -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Favorite Tips</h5>
+                    <a href="#" class="btn btn-sm btn-outline-danger">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if favorite_tips %}
+                        <div class="list-group list-group-flush">
+                            {% for favorite in favorite_tips %}
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <h6 class="mb-1">{{ favorite.tip.title }}</h6>
+                                <small class="text-muted">By {{ favorite.tip.author.username }} • {{ favorite.created_at|date:"M d, Y" }}</small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">No favorite tips yet. Start exploring!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Recently Viewed -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recently Viewed</h5>
+                </div>
+                <div class="card-body">
+                    {% if recently_viewed_items or recently_viewed_tips %}
+                        <div class="list-group list-group-flush">
+                            {% for item in recently_viewed_items %}
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="bi bi-box-seam text-primary"></i> {{ item.title }}
+                                <br><small class="text-muted">Item • {{ item.category.name }}</small>
+                            </a>
+                            {% endfor %}
+                            {% for tip in recently_viewed_tips %}
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <i class="bi bi-lightbulb text-warning"></i> {{ tip.title }}
+                                <br><small class="text-muted">Tip • {{ tip.category.name }}</small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">No recent views yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
