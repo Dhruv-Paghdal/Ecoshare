@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Recycling Centers - EcoShare{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">
+            <i class="bi bi-geo-alt"></i> Recycling Centers
+        </h2>
+
+        <form method="get" action="{% url 'centers:center_search' %}" class="d-flex">
+    <input type="text" name="q" class="form-control me-2" placeholder="Search by name, description, or city...">
+    <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+</form>
+
+    </div>
+
+    <div class="row">
+        {% for center in centers %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h4 class="card-title">{{ center.name }}</h4>
+                    <p class="text-muted">
+                        <i class="bi bi-geo"></i> {{ center.city }}, {{ center.state }}
+                    </p>
+                    <p>{{ center.description|truncatechars:100 }}</p>
+
+                    <a href="{% url 'centers:center_detail' center.slug %}"
+                       class="btn btn-outline-primary w-100">
+                        <i class="bi bi-eye"></i> View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-muted fs-4">No recycling centers found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
