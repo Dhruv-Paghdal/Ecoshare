@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Recycling Centers - EcoShare{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">
+            <i class="bi bi-geo-alt"></i> Recycling Centers
+        </h2>
+    </div>
+
+    <!-- Enhanced Search Form -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="get" action="{% url 'centers:center_search' %}">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label for="searchQuery" class="form-label">Search</label>
+                        <input type="text"
+                               name="q"
+                               id="searchQuery"
+                               class="form-control"
+                               placeholder="Search by name or description.."
+                               value="{{ query }}">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="stateSelect" class="form-label">Province/Territory</label>
+                        <select name="state" id="stateSelect" class="form-select">
+                            <option value="">All Provinces</option>
+                            {% for code, name in canadian_provinces %}
+                                <option value="{{ code }}" {% if selected_state == code %}selected{% endif %}>
+                                    {{ code }} - {{ name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="locationInput" class="form-label">Location</label>
+                        <input type="text"
+                               name="location"
+                               id="locationInput"
+                               class="form-control"
+                               placeholder="City or postal code..."
+                               value="{{ location }}">
+                    </div>
+
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="row">
+        {% for center in centers %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-body">
+                    <h4 class="card-title">{{ center.name }}</h4>
+                    <p class="text-muted">
+                        <i class="bi bi-geo"></i> {{ center.city }}, {{ center.get_state_display }}
+                    </p>
+                    <p>{{ center.description|truncatechars:100 }}</p>
+
+                    <a href="{% url 'centers:center_detail' center.slug %}"
+                       class="btn btn-outline-primary w-100 mt-auto">
+                        <i class="bi bi-eye"></i> View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center mt-4">
+                <i class="bi bi-recycle text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted fs-4">No recycling centers found.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.state %}&state={{ request.GET.state }}{% endif %}">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.state %}&state={{ request.GET.state }}{% endif %}">Previous</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.state %}&state={{ request.GET.state }}{% endif %}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.state %}&state={{ request.GET.state }}{% endif %}">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
