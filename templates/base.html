@@ -62,7 +62,22 @@
         .badge-success {
             background-color: var(--secondary-green);
         }
-        
+        /* Pagination Styling (Green Theme) */
+.pagination .page-link {
+    color: var(--primary-green) !important;
+    border-color: var(--primary-green) !important;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--primary-green) !important;
+    color: white !important;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-green) !important;
+    border-color: var(--primary-green) !important;
+    color: white !important;
+}
         footer {
             background-color: var(--primary-green);
             color: white;
@@ -95,7 +110,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="{% url 'centers:center_list' %}">
                             <i class="bi bi-geo-alt"></i> Find Centers
                         </a>
                     </li>

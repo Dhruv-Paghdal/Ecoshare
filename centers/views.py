@@ -1,15 +1,10 @@
-from django.shortcuts import render
-
-# centers/views.py
-# Responsibility: Sakshi Patel - Searching based on keyword & Searching recycling center
-
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from .models import RecyclingCenter, AcceptedMaterial
+from .models import RecyclingCenter,CANADIAN_PROVINCES
 
 
 class RecyclingCenterListView(LoginRequiredMixin, ListView):
@@ -20,7 +15,7 @@ class RecyclingCenterListView(LoginRequiredMixin, ListView):
     paginate_by = 15
 
     def get_queryset(self):
-        queryset = RecyclingCenter.objects.all().prefetch_related('materials')
+        queryset = RecyclingCenter.objects.all()
 
         # Search by keyword (name, city, address)
         search_query = self.request.GET.get('q', '')
@@ -38,20 +33,16 @@ class RecyclingCenterListView(LoginRequiredMixin, ListView):
         if city:
             queryset = queryset.filter(city__icontains=city)
 
-        # Filter by state
+        # Filter by state (now using abbreviation)
         state = self.request.GET.get('state', '')
         if state:
-            queryset = queryset.filter(state__icontains=state)
+            # State is now stored as abbreviation, so direct match
+            queryset = queryset.filter(state=state.upper())
 
         # Filter by zipcode
         zipcode = self.request.GET.get('zipcode', '')
         if zipcode:
             queryset = queryset.filter(zipcode__icontains=zipcode)
-
-        # Filter by material type
-        material = self.request.GET.get('material', '')
-        if material:
-            queryset = queryset.filter(materials__material_type=material).distinct()
 
         # Filter by features
         if self.request.GET.get('dropoff') == 'on':
@@ -65,17 +56,16 @@ class RecyclingCenterListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['search_query'] = self.request.GET.get('search', '')
+        context['search_query'] = self.request.GET.get('q', '')
         context['selected_city'] = self.request.GET.get('city', '')
         context['selected_state'] = self.request.GET.get('state', '')
         context['selected_zipcode'] = self.request.GET.get('zipcode', '')
-        context['selected_material'] = self.request.GET.get('material', '')
         context['material_choices'] = RecyclingCenter.MATERIAL_CHOICES
+        context['canadian_provinces'] = CANADIAN_PROVINCES
 
-        # Get unique cities and states for filters
+        # Get unique cities for filters
         all_centers = RecyclingCenter.objects.all()
         context['cities'] = all_centers.values_list('city', flat=True).distinct().order_by('city')
-        context['states'] = all_centers.values_list('state', flat=True).distinct().order_by('state')
 
         return context
 
@@ -90,7 +80,6 @@ class RecyclingCenterDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['materials'] = self.object.materials.all()
         context['operating_hours'] = [
             ('Monday', self.object.monday_hours),
             ('Tuesday', self.object.tuesday_hours),
@@ -111,9 +100,10 @@ class RecyclingCenterDetailView(LoginRequiredMixin, DetailView):
 
 @login_required(login_url='accounts:login')
 def center_search(request):
-    """Simple search view for recycling centers"""
+    """Enhanced search view for recycling centers with state filter"""
     query = request.GET.get('q', '')
     location = request.GET.get('location', '')
+    state = request.GET.get('state', '')
 
     centers = RecyclingCenter.objects.all()
 
@@ -127,16 +117,21 @@ def center_search(request):
     if location:
         centers = centers.filter(
             Q(city__icontains=location) |
-            Q(state__icontains=location) |
             Q(zipcode__icontains=location)
         )
 
-    centers = centers.prefetch_related('materials')[:20]
+    if state:
+        # State is now stored as abbreviation, so direct match
+        centers = centers.filter(state=state.upper())
+
+    #centers = centers.prefetch_related('materials')[:20]
 
     context = {
         'centers': centers,
         'query': query,
         'location': location,
+        'selected_state': state,
+        'canadian_provinces': CANADIAN_PROVINCES,
     }
 
     return render(request, 'centers/search_results.html', context)

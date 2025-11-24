@@ -6,27 +6,80 @@
 <div class="container mt-4">
 
     <h2 class="fw-bold mb-3">
-        <i class="bi bi-search"></i> Search Results for "{{ query }}"
+        <i class="bi bi-search"></i> Search Results
+        {% if query %}for "{{ query }}"{% endif %}
+        {% if selected_state %}
+            in {% for code, name in canadian_provinces %}{% if code == selected_state %}{{ name }}{% endif %}{% endfor %}
+        {% endif %}
     </h2>
+
+    <!-- Search Form -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="get" action="{% url 'centers:center_search' %}">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label for="searchQuery" class="form-label">Search</label>
+                        <input type="text"
+                               name="q"
+                               id="searchQuery"
+                               class="form-control"
+                               placeholder="Search by name, description, or city..."
+                               value="{{ query }}">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="stateSelect" class="form-label">Province/Territory</label>
+                        <select name="state" id="stateSelect" class="form-select">
+                            <option value="">All Provinces</option>
+                            {% for code, name in canadian_provinces %}
+                                <option value="{{ code }}" {% if selected_state == code %}selected{% endif %}>
+                                    {{ code }} - {{ name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="locationInput" class="form-label">Location</label>
+                        <input type="text"
+                               name="location"
+                               id="locationInput"
+                               class="form-control"
+                               placeholder="City or postal code..."
+                               value="{{ location }}">
+                    </div>
+
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <a href="{% url 'centers:center_list' %}" class="btn btn-outline-secondary mb-3">
         <i class="bi bi-arrow-left"></i> Back to All Centers
     </a>
 
     {% if centers %}
+        <p class="text-muted mb-3">Found {{ centers|length }} center{{ centers|length|pluralize }}</p>
+
         <div class="row">
             {% for center in centers %}
             <div class="col-md-4 mb-4">
-                <div class="card shadow">
-                    <div class="card-body">
+                <div class="card shadow h-100">
+                    <div class="card-body d-flex flex-column">
                         <h4 class="card-title">{{ center.name }}</h4>
                         <p class="text-muted">
-                            <i class="bi bi-geo"></i> {{ center.city }}, {{ center.state }}
+                            <i class="bi bi-geo"></i> {{ center.city }}, {{ center.get_state_display }}
                         </p>
-                        <p>{{ center.description|truncatechars:120 }}</p>
+                        <p class="flex-grow-1">{{ center.description|truncatechars:120 }}</p>
 
                         <a href="{% url 'centers:center_detail' center.slug %}"
-                           class="btn btn-outline-primary w-100">
+                           class="btn btn-outline-primary w-100 mt-auto">
                             <i class="bi bi-eye"></i> View Details
                         </a>
                     </div>
@@ -37,7 +90,8 @@
     {% else %}
         <div class="text-center mt-4">
             <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
-            <p class="text-muted fs-5">No results found for "{{ query }}".</p>
+            <p class="text-muted fs-5">No results found.</p>
+            <p class="text-muted">Try adjusting your search criteria or browse all centers.</p>
         </div>
     {% endif %}
 </div>

@@ -17,37 +17,78 @@
 
             <p class="text-muted">
                 <i class="bi bi-geo-alt"></i>
-                {{ center.address }}, {{ center.city }}, {{ center.state }}
+                {{ center.address }}, {{ center.city }}, {{ center.get_state_display }}
             </p>
 
+            {% if center.phone %}
             <p class="text-muted">
                 <i class="bi bi-telephone"></i>
                 {{ center.phone }}
             </p>
+            {% endif %}
 
+            {% if center.email %}
             <p class="text-muted">
                 <i class="bi bi-envelope"></i>
                 {{ center.email }}
             </p>
+            {% endif %}
+
+            {% if center.website %}
+            <p class="text-muted">
+                <i class="bi bi-globe"></i>
+                <a href="{{ center.website }}" target="_blank">{{ center.website }}</a>
+            </p>
+            {% endif %}
 
             <hr>
 
             <h5><i class="bi bi-info-circle"></i> About This Center</h5>
             <p>{{ center.description }}</p>
+            <hr>
+
+            <h5><i class="bi bi-clock"></i> Operating Hours</h5>
+            <table class="table table-sm">
+                {% for day, hours in operating_hours %}
+                <tr>
+                    <td><strong>{{ day }}</strong></td>
+                    <td>{{ hours }}</td>
+                </tr>
+                {% endfor %}
+            </table>
 
             <hr>
 
-            <h5><i class="bi bi-check-circle text-success"></i> Accepted Materials</h5>
+            <h5><i class="bi bi-star"></i> Features</h5>
             <ul>
-                {% for item in center.accepted_materials.all %}
-                    <li>{{ item.name }}</li>
-                {% endfor %}
+                {% if center.accepts_dropoff %}
+                <li><i class="bi bi-check-circle-fill text-success"></i> Accepts Drop-off</li>
+                {% endif %}
+                {% if center.offers_pickup %}
+                <li><i class="bi bi-check-circle-fill text-success"></i> Offers Pickup Service</li>
+                {% endif %}
+                {% if center.accepts_donations %}
+                <li><i class="bi bi-check-circle-fill text-success"></i> Accepts Donations</li>
+                {% endif %}
             </ul>
 
+            {% if nearby_centers %}
             <hr>
-
-            <h5><i class="bi bi-clock"></i> Opening Hours</h5>
-            <p>{{ center.opening_hours }}</p>
+            <h5><i class="bi bi-geo"></i> Nearby Centers</h5>
+            <div class="row">
+                {% for nearby in nearby_centers %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ nearby.name }}</h6>
+                            <p class="text-muted small">{{ nearby.city }}, {{ nearby.get_state_display }}</p>
+                            <a href="{% url 'centers:center_detail' nearby.slug %}" class="btn btn-sm btn-outline-primary">View</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
         </div>
     </div>

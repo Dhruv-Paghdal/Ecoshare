@@ -1,11 +1,22 @@
 from django.db import models
-
-# Create your models here.
-# centers/models.py
-# Responsibility: Sakshi Patel - Searching based on keyword & Searching recycling center
-
-from django.db import models
 from django.utils.text import slugify
+
+# Canadian provinces/territories choices
+CANADIAN_PROVINCES = [
+    ('AB', 'Alberta'),
+    ('BC', 'British Columbia'),
+    ('MB', 'Manitoba'),
+    ('NB', 'New Brunswick'),
+    ('NL', 'Newfoundland and Labrador'),
+    ('NS', 'Nova Scotia'),
+    ('NT', 'Northwest Territories'),
+    ('NU', 'Nunavut'),
+    ('ON', 'Ontario'),
+    ('PE', 'Prince Edward Island'),
+    ('QC', 'Quebec'),
+    ('SK', 'Saskatchewan'),
+    ('YT', 'Yukon'),
+]
 
 
 class RecyclingCenter(models.Model):
@@ -26,7 +37,11 @@ class RecyclingCenter(models.Model):
     description = models.TextField()
     address = models.CharField(max_length=300)
     city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
+    state = models.CharField(
+        max_length=2,
+        choices=CANADIAN_PROVINCES,
+        help_text='Select province/territory'
+    )
     zipcode = models.CharField(max_length=20)
     country = models.CharField(max_length=100, default='Canada')
     phone = models.CharField(max_length=20, blank=True)
@@ -48,6 +63,7 @@ class RecyclingCenter(models.Model):
     accepts_dropoff = models.BooleanField(default=True)
     offers_pickup = models.BooleanField(default=False)
     accepts_donations = models.BooleanField(default=False)
+
 
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -76,16 +92,9 @@ class RecyclingCenter(models.Model):
         return f"{self.name} - {self.city}"
 
     def get_full_address(self):
-        return f"{self.address}, {self.city}, {self.state} {self.zipcode}"
+        return f"{self.address}, {self.city}, {self.get_state_display()} {self.zipcode}"
+
+    def get_state_name(self):
+        return self.get_state_display()
 
 
-class AcceptedMaterial(models.Model):
-    center = models.ForeignKey(RecyclingCenter, on_delete=models.CASCADE, related_name='materials')
-    material_type = models.CharField(max_length=50, choices=RecyclingCenter.MATERIAL_CHOICES)
-    notes = models.TextField(blank=True, help_text='Special requirements or notes')
-
-    class Meta:
-        unique_together = ('center', 'material_type')
-
-    def __str__(self):
-        return f"{self.center.name} - {self.get_material_type_display()}"
