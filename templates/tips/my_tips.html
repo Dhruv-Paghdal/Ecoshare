@@ -24,8 +24,12 @@
                 <h5 class="mb-1 fw-bold">
                     <a href="{% url 'tips:tip_detail' slug=tip.slug %}" class="text-dark text-decoration-none">{{ tip.title }}</a>
                 </h5>
-                <div class="text-end">
+                    <div class="text-end">
+                    {% if tip.category %}
                     <span class="badge rounded-pill bg-success me-2">{{ tip.category.name }}</span>
+                    {% else %}
+                    <span class="badge rounded-pill bg-secondary me-2">Uncategorized</span>
+                    {% endif %}
                     {% if tip.is_featured %}
                     <span class="badge rounded-pill bg-warning text-dark"><i class="bi bi-star-fill"></i> Featured</span>
                     {% endif %}

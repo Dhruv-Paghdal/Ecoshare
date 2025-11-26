@@ -35,7 +35,7 @@
                     
                     <p class="card-text text-muted">{{ tip.content|striptags|truncatewords:30 }}</p>
                     <div class="pt-2 border-top mt-3">
-                        <small class="text-muted me-3">Category: <span class="fw-bold">{{ tip.category.name }}</span></small>
+                        <small class="text-muted me-3">Category: <span class="fw-bold">{% if tip.category %}{{ tip.category.name }}{% else %}Uncategorized{% endif %}</span></small>
                         <small class="text-muted me-3">By: {{ tip.author.username }}</small>
                         <small class="text-muted">Saved on: {{ favorite.created_at|date:"M d, Y" }}</small>
                     </div>

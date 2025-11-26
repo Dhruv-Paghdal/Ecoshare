@@ -22,7 +22,11 @@
                     <span class="me-3"><i class="bi bi-person-circle"></i> By {{ tip.author.username }}</span>
                     <span class="me-3"><i class="bi bi-clock"></i> Published on {{ tip.created_at|date:"F j, Y" }}</span>
                     <span class="me-3"><i class="bi bi-eye"></i> {{ tip.views }} views</span>
+                    {% if tip.category %}
                     <span class="badge badge-success" style="background-color: var(--primary-green);">{{ tip.category.name }}</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Uncategorized</span>
+                    {% endif %}
                 </div>
 
                 {% if tip.image %}
@@ -64,7 +68,9 @@
             <!-- Related Tips Section -->
             {% if related_tips %}
             <div class="mt-5">
-                <h5 class="fw-bold mb-3"><i class="bi bi-collection"></i> Related Tips in {{ tip.category.name }}</h5>
+                <h5 class="fw-bold mb-3"><i class="bi bi-collection"></i>
+                    Related Tips{% if tip.category %} in {{ tip.category.name }}{% endif %}
+                </h5>
                 <div class="row row-cols-1 row-cols-md-2 g-3">
                     {% for related_tip in related_tips %}
                     <div class="col">
