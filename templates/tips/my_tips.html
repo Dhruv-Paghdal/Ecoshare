@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}My Recycling Tips{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-primary"><i class="bi bi-book-half me-2"></i> My Shared Tips</h1>
+            <p class="text-muted">A list of all the recycling tips you have contributed to the EcoShare community.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'tips:tip_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Share a New Tip
+            </a>
+        </div>
+    </div>
+
+    {% if tips %}
+    <div class="list-group">
+        {% for tip in tips %}
+        <div class="list-group-item list-group-item-action p-4">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1 fw-bold">
+                    <a href="{% url 'tips:tip_detail' slug=tip.slug %}" class="text-dark text-decoration-none">{{ tip.title }}</a>
+                </h5>
+                <div class="text-end">
+                    <span class="badge rounded-pill bg-success me-2">{{ tip.category.name }}</span>
+                    {% if tip.is_featured %}
+                    <span class="badge rounded-pill bg-warning text-dark"><i class="bi bi-star-fill"></i> Featured</span>
+                    {% endif %}
+                </div>
+            </div>
+            <p class="mb-1 text-muted">{{ tip.content|striptags|truncatewords:20 }}</p>
+            <small class="text-muted">Published: {{ tip.created_at|date:"M d, Y" }} | Views: {{ tip.views }}</small>
+            
+            <div class="mt-2 text-end">
+                <a href="{% url 'tips:tip_update' slug=tip.slug %}" class="btn btn-sm btn-outline-primary me-2"><i class="bi bi-pencil"></i> Edit</a>
+                <a href="{% url 'tips:tip_delete' slug=tip.slug %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center mt-4">
+        <p class="mb-0">You haven't shared any tips yet. Start contributing now!</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

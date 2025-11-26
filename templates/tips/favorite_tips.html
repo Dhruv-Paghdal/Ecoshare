@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}My Favorite Tips{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-danger"><i class="bi bi-heart-fill me-2"></i> My Favorite Tips</h1>
+            <p class="text-muted">A collection of recycling tips you have saved for quick access.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'tips:tip_list' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Browse All Tips
+            </a>
+        </div>
+    </div>
+
+    {% if favorites %}
+    <div class="row row-cols-1 g-4">
+        {% for favorite in favorites %}
+        {% with tip=favorite.tip %}
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="card-title fw-bold">
+                            <a href="{% url 'tips:tip_detail' slug=tip.slug %}" class="text-dark text-decoration-none">{{ tip.title }}</a>
+                        </h5>
+                        <form action="{% url 'tips:toggle_favorite' slug=tip.slug %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-heart-fill"></i> Remove</button>
+                        </form>
+                    </div>
+                    
+                    <p class="card-text text-muted">{{ tip.content|striptags|truncatewords:30 }}</p>
+                    <div class="pt-2 border-top mt-3">
+                        <small class="text-muted me-3">Category: <span class="fw-bold">{{ tip.category.name }}</span></small>
+                        <small class="text-muted me-3">By: {{ tip.author.username }}</small>
+                        <small class="text-muted">Saved on: {{ favorite.created_at|date:"M d, Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center mt-4">
+        <p class="mb-0">You have no favorite tips saved yet. Click the heart icon on any tip to save it!</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
