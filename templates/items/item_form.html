@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit Item{% else %}Post New Item{% endif %} - EcoShare
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h2 class="h4 mb-0">
+                        {% if form.instance.pk %}
+                            <i class="bi bi-pencil-square text-primary"></i> Edit Item
+                        {% else %}
+                            <i class="bi bi-plus-circle-fill text-success"></i> Post New Item
+                        {% endif %}
+                    </h2>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" id="itemForm">
+                        {% csrf_token %}
+                        
+                        <h5 class="mb-3 text-muted border-bottom pb-2">Item Details</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Title</label>
+                            {{ form.title }}
+                            {{ form.title.errors }}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Category</label>
+                                {{ form.category }}
+                                {{ form.category.errors }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Condition</label>
+                                {{ form.condition }}
+                                {{ form.condition.errors }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Description</label>
+                            {{ form.description }}
+                            <div class="form-text">Provide details about size, color, age, and any defects.</div>
+                            {{ form.description.errors }}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Location</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                    {{ form.location }}
+                                </div>
+                                {{ form.location.errors }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Status</label>
+                                {{ form.status }}
+                                {{ form.status.errors }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check form-switch p-3 bg-light rounded">
+                                {{ form.is_free }}
+                                <label class="form-check-label fw-bold ms-2" for="{{ form.is_free.id_for_label }}">
+                                    List this item as FREE?
+                                </label>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3 text-muted border-bottom pb-2">Images</h5>
+                        <div class="alert alert-info py-2">
+                            <small><i class="bi bi-info-circle"></i> Upload up to 5 images. Check "Is primary" for the main cover image.</small>
+                        </div>
+                        
+                        {{ image_formset.management_form }}
+                        <div id="image-form-list">
+                            {% for form in image_formset %}
+                            <div class="row mb-3 align-items-center image-form p-2 border rounded mx-0">
+                                {{ form.id }}
+                                <div class="col-md-7">
+                                    {{ form.image }}
+                                    {% if form.instance.image %}
+                                        <div class="mt-1 small text-success">
+                                            Currently: <a href="{{ form.instance.image.url }}" target="_blank">View Image</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        {{ form.is_primary }}
+                                        <label class="form-check-label">Primary</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    {% if image_formset.can_delete %}
+                                        <div class="form-check text-danger">
+                                            {{ form.DELETE }}
+                                            <label class="form-check-label">Delete</label>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.errors %}
+                                    <div class="col-12 text-danger small mt-1">
+                                        {{ form.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-lg"></i> 
+                                {% if form.instance.pk %}Save Changes{% else %}Post Item{% endif %}
+                            </button>
+                            <a href="{% if form.instance.pk %}{% url 'items:item_detail' form.instance.slug %}{% else %}{% url 'items:item_list' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
