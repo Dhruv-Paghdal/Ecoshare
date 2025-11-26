@@ -118,7 +118,7 @@
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{% url 'core:dashboard' %}">
                                 <i class="bi bi-speedometer2"></i> Dashboard
                             </a>
                         </li>
@@ -129,7 +129,7 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">My Profile</a></li>
-                                <li><a class="dropdown-item" href="#">My Items</a></li>
+                                <li><a class="dropdown-item" href="{% url 'items:my_items' %}">My Items</href=></li>
                                 <li><a class="dropdown-item" href="#">My Tips</a></li>
                                 <li><a class="dropdown-item" href="#">Favorites</a></li>
                                 <li><hr class="dropdown-divider"></li>
