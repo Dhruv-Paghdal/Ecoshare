@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ tip.title }} - Tip Detail{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'tips:tip_list' %}" class="text-success text-decoration-none">Tips & Guides</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ tip.title|truncatechars:40 }}</li>
+                </ol>
+            </nav>
+
+            <div class="card p-5">
+                <h1 class="card-title fw-bold mb-3">{{ tip.title }}</h1>
+                
+                <div class="d-flex align-items-center mb-4 text-muted border-bottom pb-3">
+                    <span class="me-3"><i class="bi bi-person-circle"></i> By {{ tip.author.username }}</span>
+                    <span class="me-3"><i class="bi bi-clock"></i> Published on {{ tip.created_at|date:"F j, Y" }}</span>
+                    <span class="me-3"><i class="bi bi-eye"></i> {{ tip.views }} views</span>
+                    {% if tip.category %}
+                    <span class="badge badge-success" style="background-color: var(--primary-green);">{{ tip.category.name }}</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Uncategorized</span>
+                    {% endif %}
+                </div>
+
+                {% if tip.image %}
+                <img src="{{ tip.image.url }}" class="img-fluid rounded mb-4" alt="{{ tip.title }}" style="max-height: 400px; object-fit: contain; width: 100%;">
+                {% endif %}
+
+                <div class="card-text fs-5 mb-5">
+                    {{ tip.content|linebreaks }}
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    {% if user.is_authenticated %}
+                    <button id="favorite-btn" 
+                            data-url="{% url 'tips:toggle_favorite' slug=tip.slug %}"
+                            class="btn btn-outline-danger"
+                            data-is-favorited="{{ is_favorited|lower }}">
+                        <i id="favorite-icon" class="bi {% if is_favorited %}bi-heart-fill{% else %}bi-heart{% endif %}"></i> 
+                        <span id="favorite-text">{% if is_favorited %}Favorited{% else %}Add to Favorites{% endif %}</span>
+                    </button>
+                    {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-danger" title="Login to save favorites">
+                        <i class="bi bi-heart"></i> Login to Save
+                    </a>
+                    {% endif %}
+
+                    {% if user == tip.author %}
+                    <div>
+                        <a href="{% url 'tips:tip_update' slug=tip.slug %}" class="btn btn-outline-primary me-2"><i class="bi bi-pencil-square"></i> Edit</a>
+                        <a href="{% url 'tips:tip_delete' slug=tip.slug %}" class="btn btn-danger"><i class="bi bi-trash"></i> Delete</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-5 text-center">
+                <a href="{% url 'tips:tip_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back to Tips</a>
+            </div>
+
+            <!-- Related Tips Section -->
+            {% if related_tips %}
+            <div class="mt-5">
+                <h5 class="fw-bold mb-3"><i class="bi bi-collection"></i>
+                    Related Tips{% if tip.category %} in {{ tip.category.name }}{% endif %}
+                </h5>
+                <div class="row row-cols-1 row-cols-md-2 g-3">
+                    {% for related_tip in related_tips %}
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title fw-bold">
+                                    <a href="{% url 'tips:tip_detail' slug=related_tip.slug %}" class="text-decoration-none text-dark">{{ related_tip.title|truncatechars:60 }}</a>
+                                </h6>
+                                <p class="card-text text-muted small">{{ related_tip.content|striptags|truncatewords:15 }}</p>
+                                <small class="text-muted"><i class="bi bi-person"></i> By {{ related_tip.author.username }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('favorite-btn')?.addEventListener('click', function() {
+        const btn = this;
+        const url = btn.dataset.url;
+        const icon = document.getElementById('favorite-icon');
+        const text = document.getElementById('favorite-text');
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.is_favorited) {
+                icon.classList.remove('bi-heart');
+                icon.classList.add('bi-heart-fill');
+                text.textContent = 'Favorited';
+            } else {
+                icon.classList.remove('bi-heart-fill');
+                icon.classList.add('bi-heart');
+                text.textContent = 'Add to Favorites';
+            }
+            // Optional: Show a message using Django messages framework or a simple alert
+            console.log(data.message);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+{% endblock %}
