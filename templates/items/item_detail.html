@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ item.title }} - EcoShare{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'items:item_list' %}">Marketplace</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'items:item_list' %}?category={{ item.category.slug }}">{{ item.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ item.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                {% if item.images.all %}
+                <div id="itemCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in item.images.all %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ item.title }}" 
+                                 style="height: 400px; object-fit: contain; background-color: #f8f9fa;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if item.images.count > 1 %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#itemCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#itemCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-white border-top-0 overflow-auto d-flex gap-2">
+                    {% for image in item.images.all %}
+                    <img src="{{ image.image.url }}" class="img-thumbnail" 
+                         style="width: 60px; height: 60px; object-fit: cover; cursor: pointer;"
+                         data-bs-target="#itemCarousel" data-bs-slide-to="{{ forloop.counter0 }}">
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                    <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h1 class="h2 mb-0">{{ item.title }}</h1>
+                        {% if item.is_free %}
+                            <span class="badge bg-info fs-6">FREE</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark fs-6">TRADE</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4 text-muted">
+                        <i class="bi bi-geo-alt-fill text-danger"></i> {{ item.location }}
+                        <span class="mx-2">•</span>
+                        <i class="bi bi-clock"></i> Posted {{ item.created_at|timesince }} ago
+                        <span class="mx-2">•</span>
+                        <i class="bi bi-eye"></i> {{ item.views }} views
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p class="card-text" style="white-space: pre-line;">{{ item.description }}</p>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded text-center">
+                                <small class="text-muted d-block">Condition</small>
+                                <span class="fw-bold text-success">{{ item.get_condition_display }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded text-center">
+                                <small class="text-muted d-block">Status</small>
+                                <span class="fw-bold">{{ item.get_status_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex align-items-center mb-4">
+                        {% if item.owner.profile.avatar %}
+                            <img src="{{ item.owner.profile.avatar.url }}" class="rounded-circle me-3" width="50" height="50" alt="{{ item.owner.username }}">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <span class="fs-4">{{ item.owner.username|first|upper }}</span>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-0">Posted by {{ item.owner.first_name|default:item.owner.username }}</h6>
+                            <small class="text-muted">Member since {{ item.owner.date_joined|date:"M Y" }}</small>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {% if user == item.owner %}
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'items:item_update' item.slug %}" class="btn btn-outline-primary flex-grow-1">
+                                    <i class="bi bi-pencil"></i> Edit Item
+                                </a>
+                                <a href="{% url 'items:item_delete' item.slug %}" class="btn btn-outline-danger flex-grow-1">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </div>
+                        {% else %}
+                            {% if user.is_authenticated %}
+                                <a href="mailto:{{ item.owner.email }}?subject=EcoShare Inquiry: {{ item.title }}" class="btn btn-success btn-lg">
+                                    <i class="bi bi-envelope-fill"></i> Contact Owner via Email
+                                </a>
+
+                                <div class="text-center mt-1">
+                                  <small class="text-muted">
+                                    Seller Email: <span class="fw-bold text-dark user-select-all">{{ item.owner.email }}</span>
+                                  </small>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-warning text-center mb-0">
+                                    <i class="bi bi-lock-fill"></i> 
+                                    You must be <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="alert-link">logged in</a> to view contact details.
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if related_items %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-4">Similar Items</h3>
+        </div>
+        {% for related in related_items %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                {% if related.images.first %}
+                    <img src="{{ related.images.first.image.url }}" class="card-img-top" alt="{{ related.title }}" style="height: 150px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-light text-center py-5">
+                        <i class="bi bi-image text-muted fs-1"></i>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h6 class="card-title text-truncate">{{ related.title }}</h6>
+                    <p class="card-text small text-muted">{{ related.category.name }}</p>
+                    <a href="{% url 'items:item_detail' related.slug %}" class="btn btn-sm btn-outline-secondary w-100 stretched-link">View</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

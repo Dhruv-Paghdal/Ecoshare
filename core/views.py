@@ -1,27 +1,31 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from items.models import Item, Category
+from centers.models import RecyclingCenter
 
 def home(request):
+    featured_items = Item.objects.filter(status=Item.STATUS_AVAILABLE)[:3]
+    featured_tips = [] #Tip.objects.filter()[:3]
+    recent_tips = []  # Add: Tip.objects.all().order_by('-created_at')[:3] when tips model exists
     context = {
-        'featured_items': ['Featured-Items-1', 'Featured-Items-2'],
-        'featured_tips': ['Featured-Tips-1', 'Featured-Tips-2'],
-        'recent_tips': ['Recent-Tips-1', 'Recent-Tips-2'],
-        'item_categories': 5,
-        'total_items': 25,
-        'total_tips': 20,
-        'total_centers': 10,
+        'featured_items': featured_items,
+        'featured_tips': featured_tips,
+        'recent_tips': recent_tips,
+        'item_categories': Category.objects.count(),
+        'total_items': Item.objects.filter(status=Item.STATUS_AVAILABLE).count(),
+        'total_tips': 20, #Tip.objects.count() 
+        'total_centers': RecyclingCenter.objects.count(),
     }
     return render(request, 'core/home.html', context)
 
 @login_required 
 def dashboard(request):    
+    user_items = Item.objects.filter(owner=request.user).order_by('-created_at')[:5]
     context = {
-        'user_items': ['Items-1', 'Itmes-2'],
+        'user_items': user_items,
         'user_tips': ['Tips-1', 'Tips-2'],
         'favorite_tips': ['Favorite-Tips-1', 'Favorite-Tips-2'],
-        'recently_viewed_items': ['Viewed-Items-1', 'Viewed-Items-2'],
-        'recently_viewed_tips': ['Viewed-Tips-1', 'Viewed-Tips-2'],
-        'total_user_items': 15,
+        'total_user_items': Item.objects.filter(owner=request.user).count(),
         'total_user_tips': 10,
         'total_favorites': 6,
     }
