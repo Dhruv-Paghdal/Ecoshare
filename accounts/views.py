@@ -7,6 +7,8 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from .forms import UserRegistrationForm, UserProfileForm, PasswordResetRequestForm
 from django.contrib.auth.models import User
+from items.models import Item
+from tips.models import RecyclingTip
 
 class RegisterView(CreateView):
     form_class = UserRegistrationForm
@@ -93,8 +95,17 @@ def password_reset_confirm(request):
     })
 
 @login_required
+@login_required
 def profile_view(request):
-    return render(request, 'accounts/profile.html', {'user': request.user})
+    
+    recent_items = Item.objects.filter(owner=request.user).order_by('-created_at')[:5]
+    recent_tips = RecyclingTip.objects.filter(author=request.user).order_by('-created_at')[:5]
+    
+    return render(request, 'accounts/profile.html', {
+        'user': request.user,
+        'recent_items': recent_items,
+        'recent_tips': recent_tips
+    })
 
 @login_required
 def profile_edit(request):

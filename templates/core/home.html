@@ -92,7 +92,7 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Recycling Tips & Guides</h2>
-            <a href="#" class="btn btn-outline-primary">View All <i class="bi bi-arrow-right"></i></a>
+            <a href="{% url 'tips:tip_list' %}" class="btn btn-outline-primary">View All <i class="bi bi-arrow-right"></i></a>
         </div>
         <div class="row">
             {% for tip in recent_tips %}
@@ -106,7 +106,7 @@
                             <small class="text-muted">
                                 <i class="bi bi-person"></i> {{ tip.author.username }}
                             </small>
-                            <a href="#" class="btn btn-sm btn-outline-primary">Read More</a>
+                            <a href="{% url 'tips:tip_detail' slug=tip.slug %}" class="btn btn-sm btn-outline-primary">Read More</a>
                         </div>
                     </div>
                 </div>
@@ -127,7 +127,7 @@
                 <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg">Login</a>
             {% else %}
                 <a href="{% url 'items:item_create' %}" class="btn btn-light btn-lg me-3">Post an Item</a>
-                <a href="#" class="btn btn-outline-light btn-lg">Share a Tip</a>
+                <a href="{% url 'tips:tip_create' %}" class="btn btn-outline-light btn-lg">Share a Tip</a>
             {% endif %}
         </div>
     </div>
