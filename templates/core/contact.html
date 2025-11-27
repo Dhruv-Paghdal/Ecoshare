@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - EcoShare{% endblock %}
+
+{% block content %}
+<div class="text-white py-5 mb-5" style="background: linear-gradient(135deg, #2d6a4f 0%, #52b788 100%);">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Get in Touch</h1>
+        <p class="lead mb-0">Have questions or feedback? We'd love to hear from you.</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-7 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">Send us a Message</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="name" placeholder="Your Name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" placeholder="name@example.com" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" placeholder="How can we help?" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="5" placeholder="Write your message here..." required></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-4">Contact Information</h4>
+                    
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="bg-light p-3 rounded-circle text-primary">
+                                <i class="bi bi-geo-alt fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-1 fw-bold">Address</h6>
+                            <p class="text-muted mb-0">University of Windsor<br>Windsor, ON N9B 3P4, Canada</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="bg-light p-3 rounded-circle text-success">
+                                <i class="bi bi-envelope fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-1 fw-bold">Email</h6>
+                            <p class="text-muted mb-0">
+                                <a href="mailto:support@ecoshare.com" class="text-decoration-none text-muted">support@ecoshare.com</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <div class="bg-light p-3 rounded-circle text-warning">
+                                <i class="bi bi-telephone fs-4"></i>
+                            </div>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-1 fw-bold">Phone</h6>
+                            <p class="text-muted mb-0">+1 (519) 253-3000</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mt-4 mb-3">Follow Us</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="btn btn-outline-primary rounded-circle"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="btn btn-outline-info rounded-circle"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="btn btn-outline-danger rounded-circle"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-primary rounded-circle"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 250px;">
+                    <div class="text-center">
+                        <i class="bi bi-map fs-1"></i>
+                        <p class="mt-2">Map Integration</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
